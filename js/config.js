@@ -3,7 +3,6 @@
 const CONFIG = {
   // Google Sheets
   SPREADSHEET_ID: '150T793FvIRKjQ1-poH1MTt1Xzj8He8qgTChiyEWEnYk',
-  // IMPORTANT: Remplacez par votre clé API Google (voir README)
   API_KEY: 'AIzaSyAobaumv-Stbp67kAGEYE0jliwERgJj8TU',
   // Client ID OAuth 2.0
   CLIENT_ID: '89019221813-j7vt8ma7hlc1oomtcuhtrgs5dpnrj7r2.apps.googleusercontent.com',
