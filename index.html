@@ -17,20 +17,14 @@
   <!-- PptxGenJS pour génération PPTX -->
   <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
-  <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-  <!-- Google API -->
-  <script src="https://apis.google.com/js/api.js"></script>
-
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+  <link rel="icon" href="assets/logo-aimre.svg" type="image/svg+xml">
 </head>
 <body>
 
   <!-- === SIDEBAR === -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">A</div>
+      <div class="sidebar-logo"><img src="assets/logo-aimre.svg" alt="AIMRE"></div>
       <div class="sidebar-brand">
         <span class="sidebar-brand-name">AIMRE</span>
         <span class="sidebar-brand-sub">Prospect Tracker</span>
@@ -71,6 +65,12 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         <span>G&eacute;n&eacute;rer rapport</span>
       </div>
+
+      <div class="nav-section">Aide</div>
+      <div class="nav-item" data-page="wiki" onclick="navigateTo('wiki')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Guide &amp; Wiki</span>
+      </div>
       <div class="nav-item auth-only" data-page="utilisateurs" onclick="navigateTo('utilisateurs')" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.32 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         <span>Utilisateurs</span>
@@ -82,7 +82,10 @@
         <div class="user-avatar" id="userAvatar">?</div>
         <div class="user-details">
           <div class="user-name" id="userName">Non connect&eacute;</div>
-          <div class="user-role" id="userRole">Visiteur</div>
+          <div class="user-role visiteur" id="userRole">Visiteur</div>
+          <div class="connection-status disconnected" id="connectionStatus">
+            <span class="status-dot"></span>D&eacute;connect&eacute;
+          </div>
         </div>
         <button class="btn-icon" id="authBtn" onclick="handleAuth()" title="Se connecter" style="border:none;background:none;color:rgba(255,255,255,0.7)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
@@ -366,11 +369,116 @@
       </div>
     </section>
 
+    <!-- === PAGE: WIKI / GUIDE === -->
+    <section id="page-wiki" class="page-section" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Guide d'utilisation</h1>
+          <p class="page-subtitle">Tout savoir sur l'AIMRE Prospect Tracker</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="gap:var(--space-lg)">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Premiers pas</span></div>
+          <div class="card-body" style="font-size:0.9rem;line-height:1.7">
+            <h4 style="color:var(--accent);margin-bottom:8px">1. Connexion</h4>
+            <p>Cliquez sur l'ic&ocirc;ne de connexion en bas de la barre lat&eacute;rale. Entrez votre email et mot de passe fournis par l'administrateur.</p>
+            <h4 style="color:var(--accent);margin:12px 0 8px">2. Tableau de bord</h4>
+            <p>Vue d'ensemble avec les KPI principaux, graphiques et timeline des actions. Cliquez sur le camembert pour filtrer par statut.</p>
+            <h4 style="color:var(--accent);margin:12px 0 8px">3. Pipeline</h4>
+            <p>Vue Kanban des prospects. Glissez-d&eacute;posez les cartes entre colonnes pour changer le statut (mode &eacute;diteur requis).</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Gestion des prospects</span></div>
+          <div class="card-body" style="font-size:0.9rem;line-height:1.7">
+            <h4 style="color:var(--accent);margin-bottom:8px">Ajouter un prospect</h4>
+            <p>Page Prospects &rarr; bouton "Nouveau prospect". Remplissez le formulaire avec l'immeuble, la surface souhait&eacute;e, le statut et l'agent.</p>
+            <h4 style="color:var(--accent);margin:12px 0 8px">Modifier / Supprimer</h4>
+            <p>Cliquez sur une ligne du tableau ou une carte du pipeline pour ouvrir le formulaire d'&eacute;dition. La suppression est r&eacute;serv&eacute;e aux administrateurs.</p>
+            <h4 style="color:var(--accent);margin:12px 0 8px">Statuts du pipeline</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+              <span class="badge badge-nouveau">Nouveau</span>
+              <span class="badge badge-contacte">Contact&eacute;</span>
+              <span class="badge badge-visite-planifiee">Visite planifi&eacute;e</span>
+              <span class="badge badge-visite-effectuee">Visite effectu&eacute;e</span>
+              <span class="badge badge-offre">Offre re&ccedil;ue</span>
+              <span class="badge badge-negociation">N&eacute;gociation</span>
+              <span class="badge badge-signe">Bail sign&eacute;</span>
+              <span class="badge badge-perdu">Perdu</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Rapports PPTX</span></div>
+          <div class="card-body" style="font-size:0.9rem;line-height:1.7">
+            <p>Allez dans <strong>G&eacute;n&eacute;rer rapport</strong>, s&eacute;lectionnez le propri&eacute;taire ou l'immeuble, la p&eacute;riode, puis cliquez sur "T&eacute;l&eacute;charger". Un fichier PowerPoint est g&eacute;n&eacute;r&eacute; automatiquement avec :</p>
+            <ul style="margin:8px 0 0 16px">
+              <li>Page de couverture AIMRE</li>
+              <li>R&eacute;sum&eacute; KPI</li>
+              <li>Tableau des prospects actifs</li>
+              <li>D&eacute;tail par immeuble</li>
+              <li>Page de contacts</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">R&ocirc;les et permissions</span></div>
+          <div class="card-body" style="font-size:0.9rem;line-height:1.7">
+            <table style="width:100%;font-size:0.85rem">
+              <thead><tr><th>R&ocirc;le</th><th>Voir</th><th>&Eacute;diter</th><th>Supprimer</th><th>G&eacute;rer utilisateurs</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Visiteur</strong></td><td>Donn&eacute;es publiques</td><td>Non</td><td>Non</td><td>Non</td></tr>
+                <tr><td><strong>Lecteur</strong></td><td>Tout</td><td>Non</td><td>Non</td><td>Non</td></tr>
+                <tr><td><strong>Editeur</strong></td><td>Tout</td><td>Oui</td><td>Non</td><td>Non</td></tr>
+                <tr><td><strong>Admin</strong></td><td>Tout</td><td>Oui</td><td>Oui</td><td>Oui</td></tr>
+              </tbody>
+            </table>
+            <h4 style="color:var(--accent);margin:16px 0 8px">Inscrire un coll&egrave;gue</h4>
+            <p>Dans le Google Sheet, onglet <strong>Utilisateurs</strong>, ajoutez une ligne avec : Email, Nom, R&ocirc;le, Actif (Oui), Mot de passe.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Pied de page impression -->
     <div class="print-footer">
       AIMRE — Avenue de Tervuren 242A, 1150 Bruxelles — info@aimre.com — +32 2 426 24 14
     </div>
   </main>
+
+  <!-- === MODALE CONNEXION === -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-header">
+        <h2 class="modal-title">Connexion</h2>
+        <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="login-container">
+          <div class="login-logo"><img src="assets/logo-aimre.svg" alt="AIMRE"></div>
+          <h2>AIMRE Prospect Tracker</h2>
+          <p>Connectez-vous pour acc&eacute;der aux fonctions d'&eacute;dition</p>
+          <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <input type="email" class="form-input" id="loginEmail" placeholder="Adresse email" required autocomplete="email">
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-input" id="loginPassword" placeholder="Mot de passe" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center">
+              Se connecter
+            </button>
+            <div class="login-error" id="loginError"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- === MODALE PROSPECT === -->
   <div class="modal-overlay" id="prospectModal">

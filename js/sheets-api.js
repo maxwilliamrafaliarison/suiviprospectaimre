@@ -1,6 +1,5 @@
-/* === AIMRE — Google Sheets API === */
+/* === AIMRE — Google Sheets API (lecture via API Key, écriture via Apps Script) === */
 
-// Stockage des données en mémoire
 const AppData = {
   prospects: [],
   immeubles: [],
@@ -9,34 +8,32 @@ const AppData = {
   lastFetch: null
 };
 
-// Lecture des données depuis Google Sheets
+// URL du Google Apps Script pour l'écriture (à configurer — voir README)
+// Si vide, le mode écriture est désactivé et seule la lecture fonctionne
+const APPS_SCRIPT_URL = CONFIG.APPS_SCRIPT_URL || '';
+
 const SheetsAPI = {
 
-  // Lecture d'un onglet complet
+  // Lecture d'un onglet via API Key (pas besoin d'OAuth)
   async readSheet(sheetName) {
-    if (CONFIG.DEMO_MODE) {
-      return DemoData[sheetName] || [];
-    }
+    if (CONFIG.DEMO_MODE) return DemoData[sheetName] || [];
 
-    // Vérifier le cache
     const cached = Cache.get(sheetName);
     if (cached) return cached;
 
     try {
-      const response = await gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: CONFIG.SPREADSHEET_ID,
-        range: `${sheetName}!A:Z`
-      });
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SPREADSHEET_ID}/values/${encodeURIComponent(sheetName)}!A:Z?key=${CONFIG.API_KEY}`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const json = await resp.json();
 
-      const rows = response.result.values || [];
+      const rows = json.values || [];
       if (rows.length < 2) return [];
 
       const headers = rows[0];
       const data = rows.slice(1).map((row, index) => {
-        const obj = { _rowIndex: index + 2 }; // +2 car header=1, index 0-based
-        headers.forEach((h, i) => {
-          obj[h] = row[i] || '';
-        });
+        const obj = { _rowIndex: index + 2 };
+        headers.forEach((h, i) => { obj[h] = row[i] || ''; });
         return obj;
       });
 
@@ -44,96 +41,66 @@ const SheetsAPI = {
       return data;
     } catch (e) {
       console.error(`[Sheets] Erreur lecture ${sheetName}:`, e);
-      showToast(`Erreur de lecture: ${sheetName}`, 'error');
-      // Fallback sur le cache expiré ou les données démo
-      const expired = localStorage.getItem('aimre_' + sheetName);
-      if (expired) {
-        try { return JSON.parse(expired).data; } catch {}
-      }
+      // Fallback données démo
       return DemoData[sheetName] || [];
     }
   },
 
-  // Écriture d'une nouvelle ligne
+  // Écriture via Google Apps Script (proxy)
+  async writeToSheet(action, sheetName, rowIndex, values) {
+    if (CONFIG.DEMO_MODE) {
+      return this._demoWrite(action, sheetName, rowIndex, values);
+    }
+
+    if (!APPS_SCRIPT_URL) {
+      showToast('Mode écriture non configuré (voir README — Apps Script)', 'warning');
+      return this._demoWrite(action, sheetName, rowIndex, values);
+    }
+
+    if (!Auth.canEdit() && action !== 'read') {
+      showToast('Vous n\'avez pas les droits d\'édition', 'error');
+      return null;
+    }
+
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: action,
+          sheet: sheetName,
+          row: rowIndex,
+          values: values,
+          user: Auth.user ? Auth.user.email : 'anonymous'
+        })
+      });
+      const result = await resp.json();
+      if (result.error) throw new Error(result.error);
+      Cache.clear();
+      return result;
+    } catch (e) {
+      console.error(`[Sheets] Erreur écriture:`, e);
+      showToast('Erreur de sauvegarde — mode local activé', 'warning');
+      return this._demoWrite(action, sheetName, rowIndex, values);
+    }
+  },
+
   async appendRow(sheetName, values) {
-    if (CONFIG.DEMO_MODE) {
-      return this._demoAppend(sheetName, values);
-    }
-
-    if (!Auth.canEdit()) {
-      showToast('Vous n\'avez pas les droits d\'édition', 'error');
-      return null;
-    }
-
-    try {
-      const response = await gapi.client.sheets.spreadsheets.values.append({
-        spreadsheetId: CONFIG.SPREADSHEET_ID,
-        range: `${sheetName}!A:Z`,
-        valueInputOption: 'USER_ENTERED',
-        resource: { values: [values] }
-      });
-      Cache.clear();
-      return response;
-    } catch (e) {
-      console.error(`[Sheets] Erreur écriture ${sheetName}:`, e);
-      showToast('Erreur lors de l\'enregistrement', 'error');
-      return null;
-    }
+    return this.writeToSheet('append', sheetName, null, values);
   },
 
-  // Mise à jour d'une ligne existante
   async updateRow(sheetName, rowIndex, values) {
-    if (CONFIG.DEMO_MODE) {
-      return this._demoUpdate(sheetName, rowIndex, values);
-    }
-
-    if (!Auth.canEdit()) {
-      showToast('Vous n\'avez pas les droits d\'édition', 'error');
-      return null;
-    }
-
-    try {
-      const response = await gapi.client.sheets.spreadsheets.values.update({
-        spreadsheetId: CONFIG.SPREADSHEET_ID,
-        range: `${sheetName}!A${rowIndex}:Z${rowIndex}`,
-        valueInputOption: 'USER_ENTERED',
-        resource: { values: [values] }
-      });
-      Cache.clear();
-      return response;
-    } catch (e) {
-      console.error(`[Sheets] Erreur mise à jour ${sheetName}:`, e);
-      showToast('Erreur lors de la mise à jour', 'error');
-      return null;
-    }
+    return this.writeToSheet('update', sheetName, rowIndex, values);
   },
 
-  // Suppression d'une ligne (effacement du contenu)
   async deleteRow(sheetName, rowIndex) {
-    if (CONFIG.DEMO_MODE) {
-      return this._demoDelete(sheetName, rowIndex);
-    }
-
     if (!Auth.canDelete()) {
       showToast('Seuls les administrateurs peuvent supprimer', 'error');
       return null;
     }
-
-    try {
-      const response = await gapi.client.sheets.spreadsheets.values.clear({
-        spreadsheetId: CONFIG.SPREADSHEET_ID,
-        range: `${sheetName}!A${rowIndex}:Z${rowIndex}`
-      });
-      Cache.clear();
-      return response;
-    } catch (e) {
-      console.error(`[Sheets] Erreur suppression ${sheetName}:`, e);
-      showToast('Erreur lors de la suppression', 'error');
-      return null;
-    }
+    return this.writeToSheet('delete', sheetName, rowIndex, null);
   },
 
-  // Chargement de toutes les données
   async loadAll() {
     const [prospects, immeubles, proprietaires, utilisateurs] = await Promise.all([
       this.readSheet(CONFIG.SHEETS.PROSPECTS),
@@ -151,37 +118,29 @@ const SheetsAPI = {
     return AppData;
   },
 
-  // === Opérations démo (mode hors ligne) ===
-
-  _demoAppend(sheetName, values) {
+  // Opérations locales (démo ou fallback)
+  _demoWrite(action, sheetName, rowIndex, values) {
     const data = DemoData[sheetName];
     if (!data) return null;
-    const headers = Object.keys(data[0] || {}).filter(k => k !== '_rowIndex');
-    const obj = { _rowIndex: data.length + 2 };
-    headers.forEach((h, i) => { obj[h] = values[i] || ''; });
-    data.push(obj);
-    showToast('Enregistré (mode démo — non sauvegardé sur Google Sheets)', 'warning');
-    return { result: { updates: { updatedRows: 1 } } };
-  },
 
-  _demoUpdate(sheetName, rowIndex, values) {
-    const data = DemoData[sheetName];
-    if (!data) return null;
-    const item = data.find(d => d._rowIndex === rowIndex);
-    if (item) {
-      const headers = Object.keys(item).filter(k => k !== '_rowIndex');
-      headers.forEach((h, i) => { item[h] = values[i] || ''; });
+    if (action === 'append') {
+      const headers = Object.keys(data[0] || {}).filter(k => k !== '_rowIndex');
+      const obj = { _rowIndex: data.length + 2 };
+      headers.forEach((h, i) => { obj[h] = values[i] || ''; });
+      data.push(obj);
+    } else if (action === 'update' && rowIndex) {
+      const item = data.find(d => d._rowIndex === rowIndex);
+      if (item) {
+        const headers = Object.keys(item).filter(k => k !== '_rowIndex');
+        headers.forEach((h, i) => { item[h] = values[i] || ''; });
+      }
+    } else if (action === 'delete' && rowIndex) {
+      const idx = data.findIndex(d => d._rowIndex === rowIndex);
+      if (idx !== -1) data.splice(idx, 1);
     }
-    showToast('Mis à jour (mode démo)', 'warning');
-    return { result: { updatedRows: 1 } };
-  },
 
-  _demoDelete(sheetName, rowIndex) {
-    const data = DemoData[sheetName];
-    if (!data) return null;
-    const idx = data.findIndex(d => d._rowIndex === rowIndex);
-    if (idx !== -1) data.splice(idx, 1);
-    showToast('Supprimé (mode démo)', 'warning');
-    return { result: { clearedRange: sheetName } };
+    const actionLabel = action === 'append' ? 'Ajouté' : action === 'update' ? 'Modifié' : 'Supprimé';
+    showToast(`${actionLabel} (mode local)`, 'warning');
+    return { success: true };
   }
 };

@@ -74,16 +74,60 @@ function renderChartStatut() {
       labels: CONFIG.STATUTS.map(s => s.label),
       datasets: [{
         data: CONFIG.STATUTS.map(s => counts[s.id]),
-        backgroundColor: CONFIG.STATUTS.map(s => s.color),
+        backgroundColor: CONFIG.STATUTS.map(s => s.color + '99'),
+        hoverBackgroundColor: CONFIG.STATUTS.map(s => s.color),
         borderWidth: 2,
-        borderColor: '#fff'
+        borderColor: 'rgba(255,255,255,0.8)',
+        hoverBorderWidth: 3,
+        hoverOffset: 8
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      cutout: '55%',
       plugins: {
-        legend: { position: 'right', labels: { boxWidth: 12, padding: 12, font: { size: 11 } } }
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 12, padding: 10, font: { size: 11 },
+            usePointStyle: true, pointStyle: 'circle'
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(26,39,68,0.9)',
+          cornerRadius: 10,
+          padding: 12,
+          titleFont: { size: 13, weight: 'bold' },
+          bodyFont: { size: 12 },
+          callbacks: {
+            label: (ctx) => {
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              const pct = total > 0 ? Math.round(ctx.raw / total * 100) : 0;
+              return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
+            }
+          }
+        }
+      },
+      onClick: (evt, elements) => {
+        if (elements.length > 0) {
+          const idx = elements[0].index;
+          const statut = CONFIG.STATUTS[idx].id;
+          // Naviguer vers la page prospects filtrée par ce statut
+          navigateTo('prospects');
+          setTimeout(() => {
+            const chips = document.querySelectorAll('#prospectFilters .filter-chip');
+            chips.forEach(c => c.classList.remove('active'));
+            const targetChip = [...chips].find(c => c.textContent.startsWith(CONFIG.STATUTS[idx].label));
+            if (targetChip) {
+              targetChip.classList.add('active');
+              filterProspectsByStatus(statut);
+            }
+          }, 200);
+        }
+      },
+      onHover: (evt, elements) => {
+        evt.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
       }
     }
   });

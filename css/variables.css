@@ -1,12 +1,13 @@
-/* === AIMRE Prospect Tracker — Variables CSS === */
+/* === AIMRE Prospect Tracker — Variables CSS — LiquidGlass Edition === */
 :root {
   /* Couleurs principales AIMRE */
   --primary: #1a2744;
   --primary-light: #2a3f6e;
   --primary-dark: #0f1a2e;
   --secondary: #3d4f5f;
-  --accent: #2196F3;
-  --accent-light: #64B5F6;
+  --accent: #E87722;
+  --accent-light: #F5A623;
+  --accent-blue: #2196F3;
 
   /* Statuts pipeline */
   --status-nouveau: #9E9E9E;
@@ -25,15 +26,25 @@
   --info: #2980B9;
 
   /* Neutres */
-  --bg: #F8F9FA;
-  --bg-card: #FFFFFF;
-  --bg-sidebar: #1a2744;
-  --border: #E0E0E0;
-  --border-light: #F0F0F0;
+  --bg: #EEF1F5;
+  --bg-card: rgba(255, 255, 255, 0.55);
+  --bg-sidebar: rgba(26, 39, 68, 0.92);
+  --border: rgba(255, 255, 255, 0.35);
+  --border-light: rgba(255, 255, 255, 0.2);
   --text: #212121;
-  --text-secondary: #757575;
+  --text-secondary: #616161;
   --text-light: #BDBDBD;
   --text-white: #FFFFFF;
+
+  /* LiquidGlass */
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.45);
+  --glass-blur: blur(20px) saturate(180%);
+  --glass-blur-light: blur(12px) saturate(150%);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.12);
+  --glass-shadow-hover: 0 12px 40px rgba(31, 38, 135, 0.18);
+  --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 
   /* Typographie */
   --font-main: 'DM Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -48,22 +59,24 @@
   --space-2xl: 48px;
 
   /* Rayons */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --radius-full: 50%;
 
   /* Ombres */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-  --shadow-hover: 0 6px 16px rgba(0,0,0,0.14);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --shadow-hover: 0 8px 24px rgba(0,0,0,0.14);
 
   /* Sidebar */
   --sidebar-width: 260px;
   --sidebar-collapsed: 64px;
 
   /* Transitions */
-  --transition: 0.2s ease;
-  --transition-slow: 0.3s ease;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

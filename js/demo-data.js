@@ -77,7 +77,9 @@ const DemoData = {
   ],
 
   'Utilisateurs': [
-    { _rowIndex: 2, Email: 'gm@aimre.com', Nom: 'Guillaume MEERT', Rôle: 'Admin', Actif: 'Oui' },
-    { _rowIndex: 3, Email: 'mdr@aimre.com', Nom: 'Marine de Radiguès', Rôle: 'Editeur', Actif: 'Oui' }
+    { _rowIndex: 2, Email: 'gm@aimre.com', Nom: 'Guillaume MEERT', 'Rôle': 'Admin', Actif: 'Oui', 'Mot de passe': 'aimre2026' },
+    { _rowIndex: 3, Email: 'mdr@aimre.com', Nom: 'Marine de Radiguès', 'Rôle': 'Editeur', Actif: 'Oui', 'Mot de passe': 'aimre2026' },
+    { _rowIndex: 4, Email: 'max.fianar@gmail.com', Nom: 'Max William RAFALIARISON', 'Rôle': 'Admin', Actif: 'Oui', 'Mot de passe': 'aimre2026' },
+    { _rowIndex: 5, Email: 'mayarafaliarison@gmail.com', Nom: 'Maya RAFALIARISON', 'Rôle': 'Admin', Actif: 'Oui', 'Mot de passe': 'aimre2026' }
   ]
 };

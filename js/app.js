@@ -1,8 +1,7 @@
 /* === AIMRE Prospect Tracker — Point d'entrée === */
 
-// Initialisation au chargement
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('[AIMRE] Démarrage de l\'application...');
+  console.log('[AIMRE] Démarrage...');
 
   // Date courante
   const now = new Date();
@@ -11,20 +10,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('printDate').textContent =
     'Généré le ' + now.toLocaleDateString('fr-BE');
 
-  // Détecter le mode (démo ou API)
+  // Mode démo ?
   if (CONFIG.DEMO_MODE) {
-    console.log('[AIMRE] Mode démo activé — Configurez les clés API dans js/config.js');
-    showToast('Mode démo — Les données ne sont pas connectées à Google Sheets', 'warning');
-  } else {
-    // Initialiser Google API
-    initGapiClient();
-    window.addEventListener('load', initGIS);
+    console.log('[AIMRE] Mode démo — Configurez API_KEY dans js/config.js');
+    showToast('Mode démo — Données locales', 'warning');
   }
+
+  // Restaurer la session si existante
+  Auth.restoreSession();
 
   // Charger les données
   await refreshData();
 
-  // Responsive : afficher le bouton menu mobile
+  // Responsive
   checkMobileView();
   window.addEventListener('resize', checkMobileView);
 
@@ -33,27 +31,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.addEventListener('hashchange', handleHashNavigation);
 
   // Écouter les changements de page
-  window.addEventListener('pageChange', (e) => {
-    const page = e.detail.page;
-    renderPage(page);
-  });
+  window.addEventListener('pageChange', (e) => renderPage(e.detail.page));
 
-  console.log('[AIMRE] Application prête.');
+  console.log('[AIMRE] Prêt.');
 });
 
-// Chargement / rafraîchissement des données
+// Chargement / rafraîchissement
 async function refreshData() {
   try {
     await SheetsAPI.loadAll();
     renderCurrentPage();
     updateAuthUI();
   } catch (e) {
-    console.error('[AIMRE] Erreur chargement données:', e);
+    console.error('[AIMRE] Erreur chargement:', e);
     showToast('Erreur de chargement des données', 'error');
   }
 }
 
-// Rendu de la page courante
+// Rendu page courante
 function renderCurrentPage() {
   const activePage = document.querySelector('.nav-item.active');
   const page = activePage ? activePage.dataset.page : 'dashboard';
@@ -62,34 +57,19 @@ function renderCurrentPage() {
 
 function renderPage(page) {
   switch (page) {
-    case 'dashboard':
-      renderDashboard();
-      break;
-    case 'pipeline':
-      renderPipeline();
-      break;
-    case 'prospects':
-      renderProspects();
-      break;
-    case 'immeubles':
-      renderImmeubles();
-      break;
-    case 'proprietaires':
-      renderProprietaires();
-      break;
-    case 'calendrier':
-      renderCalendar();
-      break;
-    case 'rapport':
-      initReportSelectors();
-      break;
-    case 'utilisateurs':
-      renderUsers();
-      break;
+    case 'dashboard': renderDashboard(); break;
+    case 'pipeline': renderPipeline(); break;
+    case 'prospects': renderProspects(); break;
+    case 'immeubles': renderImmeubles(); break;
+    case 'proprietaires': renderProprietaires(); break;
+    case 'calendrier': renderCalendar(); break;
+    case 'rapport': initReportSelectors(); break;
+    case 'utilisateurs': renderUsers(); break;
+    case 'wiki': /* contenu statique HTML */ break;
   }
 }
 
-// Gestion des utilisateurs (admin)
+// Gestion utilisateurs (admin)
 function renderUsers() {
   const tbody = document.getElementById('usersBody');
   if (!tbody) return;
@@ -98,20 +78,18 @@ function renderUsers() {
     <tr>
       <td><strong>${escapeHtml(u.Nom)}</strong></td>
       <td>${escapeHtml(u.Email)}</td>
-      <td><span class="badge ${u.Rôle === 'Admin' ? 'badge-negociation' : u.Rôle === 'Editeur' ? 'badge-contacte' : 'badge-nouveau'}">${escapeHtml(u.Rôle)}</span></td>
-      <td>${u.Actif === 'Oui' ? '<span style="color:var(--success)">Actif</span>' : '<span style="color:var(--danger)">Inactif</span>'}</td>
-      <td>
-        ${Auth.canManageUsers() ? `<button class="btn btn-sm btn-secondary">Modifier</button>` : '—'}
-      </td>
+      <td><span class="badge ${(u['Rôle'] || u.Role || '') === 'Admin' ? 'badge-negociation' : (u['Rôle'] || u.Role || '') === 'Editeur' ? 'badge-contacte' : 'badge-nouveau'}">${escapeHtml(u['Rôle'] || u.Role || '')}</span></td>
+      <td>${(u.Actif || '').toLowerCase() === 'oui' ? '<span style="color:var(--success)">Actif</span>' : '<span style="color:var(--danger)">Inactif</span>'}</td>
+      <td>${Auth.canManageUsers() ? '<button class="btn btn-sm btn-secondary">Modifier</button>' : '—'}</td>
     </tr>
   `).join('');
 }
 
 function openUserModal() {
-  showToast('Ajoutez directement les utilisateurs dans l\'onglet "Utilisateurs" du Google Sheet', 'info');
+  showToast('Ajoutez les utilisateurs dans l\'onglet "Utilisateurs" du Google Sheet', 'info');
 }
 
-// Navigation par URL hash
+// Navigation hash
 function handleHashNavigation() {
   const hash = window.location.hash.replace('#', '');
   if (hash && document.querySelector(`.nav-item[data-page="${hash}"]`)) {
@@ -130,7 +108,7 @@ function checkMobileView() {
   }
 }
 
-// Fermer sidebar au clic en dehors (mobile)
+// Fermer sidebar mobile au clic dehors
 document.addEventListener('click', (e) => {
   const sidebar = document.getElementById('sidebar');
   const toggle = document.getElementById('mobileToggle');
@@ -144,7 +122,6 @@ document.addEventListener('click', (e) => {
 
 // Raccourcis clavier
 document.addEventListener('keydown', (e) => {
-  // Escape : fermer les modales
   if (e.key === 'Escape') {
     document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
   }
