@@ -1,0 +1,115 @@
+/* === AIMRE — Styles d'impression === */
+@media print {
+  * { box-shadow: none !important; }
+
+  body {
+    background: white;
+    font-size: 11pt;
+    color: black;
+  }
+
+  .sidebar,
+  .mobile-toggle,
+  .page-actions,
+  .btn,
+  .toast-container,
+  .modal-overlay,
+  .filters-bar,
+  .no-print { display: none !important; }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  .card, .kpi-card, .chart-card {
+    border: 1px solid #ddd;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  table {
+    font-size: 9pt;
+  }
+
+  thead {
+    background: #1a2744 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .badge {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .kpi-card {
+    border-left-width: 3px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .pipeline-container {
+    flex-wrap: wrap;
+  }
+
+  .pipeline-column {
+    min-width: auto;
+    flex: 1;
+  }
+
+  a { text-decoration: none; color: black; }
+  a[href]::after { content: none; }
+
+  .page-title {
+    font-size: 16pt;
+    color: #1a2744;
+  }
+
+  /* Saut de page avant sections principales */
+  .section-break { page-break-before: always; }
+
+  /* En-tête d'impression */
+  .print-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12pt;
+    border-bottom: 2px solid #1a2744;
+    margin-bottom: 16pt;
+  }
+
+  .print-header-logo {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #1a2744;
+  }
+
+  .print-header-info {
+    text-align: right;
+    font-size: 9pt;
+    color: #555;
+  }
+
+  .print-footer {
+    display: block !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 8pt;
+    color: #999;
+    border-top: 1px solid #ddd;
+    padding-top: 4pt;
+  }
+}
+
+/* Masqué par défaut, visible à l'impression */
+.print-header,
+.print-footer { display: none; }

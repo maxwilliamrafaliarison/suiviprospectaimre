@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIMRE — Prospect Tracker</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/print.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+  <!-- PptxGenJS pour génération PPTX -->
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Google API -->
+  <script src="https://apis.google.com/js/api.js"></script>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+</head>
+<body>
+
+  <!-- === SIDEBAR === -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">A</div>
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-name">AIMRE</span>
+        <span class="sidebar-brand-sub">Prospect Tracker</span>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Tableau de bord</span>
+      </div>
+      <div class="nav-item" data-page="pipeline" onclick="navigateTo('pipeline')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v4H3z"/><path d="M5 7v4h14V7"/><path d="M7 11v4h10v-4"/><path d="M9 15v4h6v-4"/></svg>
+        <span>Pipeline</span>
+      </div>
+      <div class="nav-item" data-page="prospects" onclick="navigateTo('prospects')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Prospects</span>
+      </div>
+
+      <div class="nav-section">Gestion</div>
+      <div class="nav-item" data-page="immeubles" onclick="navigateTo('immeubles')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg>
+        <span>Immeubles</span>
+      </div>
+      <div class="nav-item" data-page="proprietaires" onclick="navigateTo('proprietaires')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Propri&eacute;taires</span>
+      </div>
+      <div class="nav-item" data-page="calendrier" onclick="navigateTo('calendrier')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+        <span>Calendrier</span>
+      </div>
+
+      <div class="nav-section">Rapports</div>
+      <div class="nav-item" data-page="rapport" onclick="navigateTo('rapport')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>G&eacute;n&eacute;rer rapport</span>
+      </div>
+      <div class="nav-item auth-only" data-page="utilisateurs" onclick="navigateTo('utilisateurs')" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.32 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Utilisateurs</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-info" id="userInfo">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div class="user-details">
+          <div class="user-name" id="userName">Non connect&eacute;</div>
+          <div class="user-role" id="userRole">Visiteur</div>
+        </div>
+        <button class="btn-icon" id="authBtn" onclick="handleAuth()" title="Se connecter" style="border:none;background:none;color:rgba(255,255,255,0.7)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- === BOUTON MENU MOBILE === -->
+  <button class="btn-icon mobile-toggle" id="mobileToggle" onclick="toggleSidebar()" style="display:none;position:fixed;top:12px;left:12px;z-index:150">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+
+  <!-- === CONTENU PRINCIPAL === -->
+  <main class="main-content" id="mainContent">
+
+    <!-- En-tête d'impression -->
+    <div class="print-header">
+      <div class="print-header-logo">AIMRE — Prospect Tracker</div>
+      <div class="print-header-info">
+        Asset &amp; Investment Management Real Estate<br>
+        Avenue de Tervuren 242A, 1150 Bruxelles<br>
+        <span id="printDate"></span>
+      </div>
+    </div>
+
+    <!-- === PAGE: DASHBOARD === -->
+    <section id="page-dashboard" class="page-section">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Tableau de bord</h1>
+          <p class="page-subtitle">Vue d'ensemble de la prospection — <span id="dashboardDate"></span></p>
+        </div>
+        <div class="page-actions no-print">
+          <button class="btn btn-secondary" onclick="refreshData()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Actualiser
+          </button>
+          <button class="btn btn-primary" onclick="navigateTo('rapport')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Rapport PPTX
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card info">
+          <div class="kpi-label">Prospects actifs</div>
+          <div class="kpi-value" id="kpiProspectsActifs">—</div>
+        </div>
+        <div class="kpi-card success">
+          <div class="kpi-label">Taux d'occupation</div>
+          <div class="kpi-value" id="kpiTauxOccupation">—</div>
+        </div>
+        <div class="kpi-card danger">
+          <div class="kpi-label">Lots vacants</div>
+          <div class="kpi-value" id="kpiLotsVacants">—</div>
+        </div>
+        <div class="kpi-card success">
+          <div class="kpi-label">Baux sign&eacute;s ce mois</div>
+          <div class="kpi-value" id="kpiBauxSignes">—</div>
+        </div>
+        <div class="kpi-card warning">
+          <div class="kpi-label">Actions en retard</div>
+          <div class="kpi-value" id="kpiActionsRetard">—</div>
+        </div>
+      </div>
+
+      <!-- Graphiques -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>R&eacute;partition par statut</h3>
+          <div class="chart-wrapper"><canvas id="chartStatut"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Prospects par immeuble</h3>
+          <div class="chart-wrapper"><canvas id="chartImmeuble"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>&Eacute;volution mensuelle</h3>
+          <div class="chart-wrapper"><canvas id="chartEvolution"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Taux d'occupation par propri&eacute;taire</h3>
+          <div class="chart-wrapper"><canvas id="chartOccupation"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Timeline activités récentes -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Activit&eacute;s r&eacute;centes</span>
+        </div>
+        <div class="card-body">
+          <div class="timeline-list" id="timelineList">
+            <div class="empty-state">
+              <p>Chargement des donn&eacute;es...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- === PAGE: PIPELINE === -->
+    <section id="page-pipeline" class="page-section" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Pipeline de prospection</h1>
+          <p class="page-subtitle">Glissez les cartes pour changer le statut</p>
+        </div>
+        <div class="page-actions no-print">
+          <div class="filters-bar" style="margin:0">
+            <select class="form-select" id="pipelineFilterBuilding" style="width:auto" onchange="filterPipeline()">
+              <option value="">Tous les immeubles</option>
+            </select>
+            <select class="form-select" id="pipelineFilterOwner" style="width:auto" onchange="filterPipeline()">
+              <option value="">Tous les propri&eacute;taires</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="pipeline-container" id="pipelineContainer"></div>
+    </section>
+
+    <!-- === PAGE: PROSPECTS === -->
+    <section id="page-prospects" class="page-section" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Liste des prospects</h1>
+          <p class="page-subtitle" id="prospectCount">—</p>
+        </div>
+        <div class="page-actions no-print">
+          <input type="text" class="search-input" placeholder="Rechercher..." id="prospectSearch" oninput="filterProspects()">
+          <button class="btn btn-primary auth-required" onclick="openProspectModal()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nouveau prospect
+          </button>
+        </div>
+      </div>
+      <div class="filters-bar no-print" id="prospectFilters"></div>
+      <div class="card">
+        <div class="table-container">
+          <table id="prospectsTable">
+            <thead>
+              <tr>
+                <th>Prospect</th>
+                <th>Immeuble</th>
+                <th>Statut</th>
+                <th>Surface (m&sup2;)</th>
+                <th>Agent</th>
+                <th>Derni&egrave;re action</th>
+                <th>Prochaine action</th>
+                <th class="auth-only-cell">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="prospectsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- === PAGE: IMMEUBLES === -->
+    <section id="page-immeubles" class="page-section" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Immeubles</h1>
+          <p class="page-subtitle" id="immeublesCount">—</p>
+        </div>
+        <div class="page-actions no-print">
+          <input type="text" class="search-input" placeholder="Rechercher..." id="immeublesSearch" oninput="filterImmeubles()">
+          <button class="btn btn-primary auth-required" onclick="openImmeubleModal()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nouvel immeuble
+          </button>
+        </div>
+      </div>
+      <div class="grid-auto" id="immeublesGrid"></div>
+    </section>
+
+    <!-- === PAGE: PROPRIÉTAIRES === -->
+    <section id="page-proprietaires" class="page-section" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Propri&eacute;taires</h1>
+          <p class="page-subtitle" id="proprietairesCount">—</p>
+        </div>
+        <div class="page-actions no-print">
+          <button class="btn btn-primary auth-required" onclick="openProprietaireModal()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nouveau propri&eacute;taire
+          </button>
+        </div>
+      </div>
+      <div class="grid-auto" id="proprietairesGrid"></div>
+    </section>
+
+    <!-- === PAGE: CALENDRIER === -->
+    <section id="page-calendrier" class="page-section" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Calendrier des actions</h1>
+          <p class="page-subtitle">Prochaines visites, relances et rendez-vous</p>
+        </div>
+      </div>
+      <div class="tabs no-print">
+        <div class="tab active" onclick="switchCalendarView('upcoming')">A venir</div>
+        <div class="tab" onclick="switchCalendarView('overdue')">En retard</div>
+        <div class="tab" onclick="switchCalendarView('all')">Tout</div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="timeline-list" id="calendarList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- === PAGE: RAPPORT === -->
+    <section id="page-rapport" class="page-section" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">G&eacute;n&eacute;rer un rapport PPTX</h1>
+          <p class="page-subtitle">S&eacute;lectionnez un propri&eacute;taire et la p&eacute;riode</p>
+        </div>
+      </div>
+      <div class="card" style="max-width:600px">
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Propri&eacute;taire</label>
+            <select class="form-select" id="reportOwner">
+              <option value="">Tous les propri&eacute;taires</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Immeuble</label>
+            <select class="form-select" id="reportBuilding">
+              <option value="">Tous les immeubles</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mois</label>
+              <select class="form-select" id="reportMonth"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ann&eacute;e</label>
+              <select class="form-select" id="reportYear"></select>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="generatePPTX()" style="width:100%;margin-top:var(--space-md)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            T&eacute;l&eacute;charger le rapport PPTX
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- === PAGE: UTILISATEURS (admin) === -->
+    <section id="page-utilisateurs" class="page-section" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gestion des utilisateurs</h1>
+          <p class="page-subtitle">R&eacute;serv&eacute; aux administrateurs</p>
+        </div>
+        <div class="page-actions no-print">
+          <button class="btn btn-primary" onclick="openUserModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nouvel utilisateur
+          </button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Nom</th><th>Email</th><th>R&ocirc;le</th><th>Actif</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pied de page impression -->
+    <div class="print-footer">
+      AIMRE — Avenue de Tervuren 242A, 1150 Bruxelles — info@aimre.com — +32 2 426 24 14
+    </div>
+  </main>
+
+  <!-- === MODALE PROSPECT === -->
+  <div class="modal-overlay" id="prospectModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="prospectModalTitle">Nouveau prospect</h2>
+        <button class="modal-close" onclick="closeModal('prospectModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="prospectForm" onsubmit="saveProspect(event)">
+          <input type="hidden" id="prospectId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nom du prospect *</label>
+              <input type="text" class="form-input" id="prospectNom" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact (email/t&eacute;l)</label>
+              <input type="text" class="form-input" id="prospectContact">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Immeuble *</label>
+              <select class="form-select" id="prospectImmeuble" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Surface souhait&eacute;e (m&sup2;)</label>
+              <input type="text" class="form-input" id="prospectSurface">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Statut</label>
+              <select class="form-select" id="prospectStatut">
+                <option value="Nouveau">Nouveau</option>
+                <option value="Contact&eacute;">Contact&eacute;</option>
+                <option value="Visite planifi&eacute;e">Visite planifi&eacute;e</option>
+                <option value="Visite effectu&eacute;e">Visite effectu&eacute;e</option>
+                <option value="Offre re&ccedil;ue">Offre re&ccedil;ue</option>
+                <option value="N&eacute;gociation">N&eacute;gociation</option>
+                <option value="Bail sign&eacute;">Bail sign&eacute;</option>
+                <option value="Perdu">Perdu</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Source</label>
+              <select class="form-select" id="prospectSource">
+                <option value="">—</option>
+                <option value="Broker">Broker</option>
+                <option value="Site web">Site web</option>
+                <option value="R&eacute;seau">R&eacute;seau</option>
+                <option value="Spontan&eacute;">Spontan&eacute;</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Loyer demand&eacute; (&euro;/mois)</label>
+              <input type="text" class="form-input" id="prospectLoyer">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Agent en charge</label>
+              <input type="text" class="form-input" id="prospectAgent">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date premier contact</label>
+              <input type="date" class="form-input" id="prospectDateContact">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Dur&eacute;e bail souhait&eacute;e</label>
+              <input type="text" class="form-input" id="prospectDureeBail" placeholder="ex: 3/6/9">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Prochaine action</label>
+              <input type="text" class="form-input" id="prospectProchaineAction">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date prochaine action</label>
+              <input type="date" class="form-input" id="prospectDateProchaine">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Responsable AIMRE</label>
+            <input type="text" class="form-input" id="prospectResponsable">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes / Commentaires</label>
+            <textarea class="form-textarea" id="prospectNotes"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('prospectModal')">Annuler</button>
+        <button class="btn btn-primary" onclick="document.getElementById('prospectForm').requestSubmit()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === MODALE IMMEUBLE === -->
+  <div class="modal-overlay" id="immeubleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="immeubleModalTitle">Nouvel immeuble</h2>
+        <button class="modal-close" onclick="closeModal('immeubleModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="immeubleForm" onsubmit="saveImmeuble(event)">
+          <input type="hidden" id="immeubleId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nom de l'immeuble *</label>
+              <input type="text" class="form-input" id="immeubleNom" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Propri&eacute;taire *</label>
+              <select class="form-select" id="immeubleProprietaire" required></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adresse</label>
+            <input type="text" class="form-input" id="immeubleAdresse">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Type</label>
+              <select class="form-select" id="immeubleType">
+                <option value="Bureau">Bureau</option>
+                <option value="Commerce">Commerce</option>
+                <option value="R&eacute;sidentiel">R&eacute;sidentiel</option>
+                <option value="Mixte">Mixte</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Surface totale (m&sup2;)</label>
+              <input type="number" class="form-input" id="immeubleSurface">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre de lots</label>
+              <input type="number" class="form-input" id="immeubleLots">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Lots vacants</label>
+              <input type="number" class="form-input" id="immeubleVacants">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">URL photo</label>
+            <input type="url" class="form-input" id="immeublePhoto">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('immeubleModal')">Annuler</button>
+        <button class="btn btn-primary" onclick="document.getElementById('immeubleForm').requestSubmit()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === MODALE PROPRIÉTAIRE === -->
+  <div class="modal-overlay" id="proprietaireModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="proprietaireModalTitle">Nouveau propri&eacute;taire</h2>
+        <button class="modal-close" onclick="closeModal('proprietaireModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="proprietaireForm" onsubmit="saveProprietaire(event)">
+          <input type="hidden" id="proprietaireId">
+          <div class="form-group">
+            <label class="form-label">Nom *</label>
+            <input type="text" class="form-input" id="proprietaireNom" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Contact principal</label>
+              <input type="text" class="form-input" id="proprietaireContact">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="proprietaireEmail">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">T&eacute;l&eacute;phone</label>
+              <input type="tel" class="form-input" id="proprietaireTel">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-textarea" id="proprietaireNotes"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('proprietaireModal')">Annuler</button>
+        <button class="btn btn-primary" onclick="document.getElementById('proprietaireForm').requestSubmit()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === MODALE CONFIRMATION SUPPRESSION === -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal" style="max-width:400px">
+      <div class="modal-header">
+        <h2 class="modal-title">Confirmer la suppression</h2>
+        <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="deleteMessage">Voulez-vous vraiment supprimer cet &eacute;l&eacute;ment ?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Annuler</button>
+        <button class="btn btn-danger" id="deleteConfirmBtn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- === SCRIPTS === -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/sheets-api.js"></script>
+  <script src="js/demo-data.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/pipeline.js"></script>
+  <script src="js/crud.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+/* === AIMRE Dashboard — Styles spécifiques === */
+
+/* === PIPELINE KANBAN === */
+.pipeline-container {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.pipeline-column {
+  min-width: 220px;
+  max-width: 260px;
+  flex-shrink: 0;
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.pipeline-header {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pipeline-header .count {
+  background: rgba(255,255,255,0.3);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+.pipeline-header.nouveau { background: var(--status-nouveau); color: white; }
+.pipeline-header.contacte { background: var(--status-contacte); color: white; }
+.pipeline-header.visite-planifiee { background: var(--status-visite-planifiee); color: white; }
+.pipeline-header.visite-effectuee { background: var(--status-visite-effectuee); color: white; }
+.pipeline-header.offre { background: var(--status-offre); color: white; }
+.pipeline-header.negociation { background: var(--status-negociation); color: white; }
+.pipeline-header.signe { background: var(--status-signe); color: white; }
+.pipeline-header.perdu { background: var(--status-perdu); color: white; }
+
+.pipeline-body {
+  padding: var(--space-sm);
+  flex: 1;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.pipeline-card {
+  background: white;
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  border-left: 3px solid transparent;
+}
+.pipeline-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.pipeline-card.dragging { opacity: 0.5; }
+
+.pipeline-card-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.pipeline-card-building {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pipeline-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-sm);
+  font-size: 0.7rem;
+  color: var(--text-light);
+}
+
+.pipeline-card-surface {
+  background: var(--bg);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* === GRAPHIQUES === */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.chart-card {
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  padding: var(--space-lg);
+}
+
+.chart-card h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: var(--space-md);
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 250px;
+}
+
+/* === CALENDRIER / TIMELINE === */
+.timeline-container {
+  margin-bottom: var(--space-xl);
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeline-item {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-left: 2px solid var(--border);
+  margin-left: var(--space-md);
+  padding-left: var(--space-lg);
+  position: relative;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: var(--space-lg);
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  border: 2px solid white;
+  box-shadow: var(--shadow-sm);
+}
+
+.timeline-item.urgent::before { background: var(--danger); }
+.timeline-item.completed::before { background: var(--success); }
+
+.timeline-date {
+  min-width: 80px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.timeline-content { flex: 1; }
+.timeline-content h4 { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+.timeline-content p { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+.timeline-content .tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  background: var(--bg);
+  margin-top: 4px;
+}
+
+/* === VUE TABLEAU PROSPECTS === */
+.prospect-row { cursor: pointer; }
+.prospect-row:hover td { background: rgba(33,150,243,0.06); }
+
+.prospect-name {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.prospect-building {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.building-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* === JAUGES === */
+.gauge-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.gauge-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.gauge-fill.high { background: var(--success); }
+.gauge-fill.medium { background: var(--warning); }
+.gauge-fill.low { background: var(--danger); }
+
+.gauge-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* === TABS === */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border-light);
+  margin-bottom: var(--space-lg);
+}
+
+.tab {
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition);
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* === RESPONSIVE DASHBOARD === */
+@media (max-width: 1024px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .pipeline-container { padding-bottom: var(--space-lg); }
+}
+
+@media (max-width: 768px) {
+  .pipeline-column { min-width: 180px; }
+  .chart-wrapper { height: 200px; }
+}
