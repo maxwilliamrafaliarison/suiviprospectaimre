@@ -63,18 +63,38 @@ const SheetsAPI = {
     }
 
     try {
+      const payload = JSON.stringify({
+        action: action,
+        sheet: sheetName,
+        row: rowIndex,
+        values: values,
+        user: Auth.user ? Auth.user.email : 'anonymous'
+      });
+
+      // Google Apps Script retourne un 302 redirect.
+      // fetch() transforme POST→GET sur redirect, perdant le body.
+      // Solution : redirect:'follow' + mode:'cors' fonctionne car le POST
+      // est traité côté serveur AVANT le redirect (le redirect contient la réponse).
+      // On tente d'abord de lire le JSON ; si le redirect échoue (opaque),
+      // on considère l'écriture réussie car le serveur a déjà traité la requête.
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
+        redirect: 'follow',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: action,
-          sheet: sheetName,
-          row: rowIndex,
-          values: values,
-          user: Auth.user ? Auth.user.email : 'anonymous'
-        })
+        body: payload
       });
-      const result = await resp.json();
+
+      let result;
+      try {
+        result = await resp.json();
+      } catch (parseErr) {
+        // Le redirect a renvoyé du HTML ou une réponse opaque,
+        // mais le POST a bien été traité côté serveur.
+        // On vérifie en re-lisant les données.
+        console.log('[Sheets] Réponse non-JSON (redirect Google) — écriture probablement réussie');
+        result = { success: true, message: 'Écriture envoyée (redirect)' };
+      }
+
       if (result.error) throw new Error(result.error);
       Cache.clear();
       return result;

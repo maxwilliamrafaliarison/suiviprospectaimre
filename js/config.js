@@ -5,7 +5,7 @@ const CONFIG = {
   SPREADSHEET_ID: '150T793FvIRKjQ1-poH1MTt1Xzj8He8qgTChiyEWEnYk',
   API_KEY: 'AIzaSyAobaumv-Stbp67kAGEYE0jliwERgJj8TU',
   // URL du Google Apps Script pour l'écriture (optionnel — voir README)
-  APPS_SCRIPT_URL: '',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzrvBZ5BgPTyUYSGtLbZALJ84tipmV0NxYTodhDc4QHPCDmz938flMHZfok_vpcRfs/exec',
 
   // Noms des onglets Google Sheets
   SHEETS: {
