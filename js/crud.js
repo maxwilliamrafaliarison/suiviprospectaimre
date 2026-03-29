@@ -119,7 +119,7 @@ function openProspectModalEdit(prospect) {
   document.getElementById('prospectDureeBail').value = prospect['Durée bail'] || '';
   document.getElementById('prospectProchaineAction').value = prospect['Prochaine action'] || '';
   document.getElementById('prospectDateProchaine').value = prospect['Date prochaine action'] || '';
-  document.getElementById('prospectResponsable').value = prospect['Responsable AIMRE'] || '';
+  document.getElementById('prospectResponsable').value = prospect['Agent en charge'] || '';
   document.getElementById('prospectNotes').value = prospect.Notes || '';
 
   openModal('prospectModal');
@@ -149,7 +149,8 @@ async function saveProspect(e) {
     document.getElementById('prospectProchaineAction').value,
     document.getElementById('prospectDateProchaine').value,
     document.getElementById('prospectNotes').value,
-    document.getElementById('prospectResponsable').value
+    document.getElementById('prospectAgent').value,         // Responsable AIMRE (col P)
+    document.getElementById('prospectResponsable').value    // Agent en charge (col Q)
   ];
 
   let result;
